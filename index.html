@@ -38,23 +38,23 @@
   .field label { font-size: 12px; color: #888; display: block; margin-bottom: 4px; font-weight: 500; }
   .field input { width: 100%; padding: 9px 12px; border: 1px solid #d0c8e8; border-radius: 10px; font-size: 14px; background: #f7f5fc; color: #1a1a2e; outline: none; font-family: inherit; }
   .field input:focus { border-color: #6c63d4; background: white; }
-  .card { background: white; border-radius: 16px; border: 2px solid #b8a8e8; width: 100%; padding: 18px 20px; }
-  .card.green { background: #d4f5e5; border-color: #1D9E75; }
+  .card { background: #ede9fc; border-radius: 16px; border: 2px solid #7c6fd4; width: 100%; padding: 18px 20px; }
+  .card.green { background: #b6f0d8; border-color: #1D9E75; }
   .card-name { font-size: 20px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; }
   .card-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 14px; }
   .card-row:last-child { margin-bottom: 0; }
-  .card-icon { color: #6c63d4; font-size: 19px; margin-top: 1px; flex-shrink: 0; }
+  .card-icon { color: #1a1a2e; font-size: 19px; margin-top: 1px; flex-shrink: 0; }
   .card-label { font-weight: 600; color: #1a1a2e; white-space: nowrap; }
-  .card-val { color: #444; margin-left: 4px; }
-  .green-title { font-size: 22px; font-weight: 600; color: #085041; text-align: center; margin-bottom: 8px; }
-  .green-sub { text-align: center; font-size: 14px; color: #0F6E56; }
-  .green-sub b { color: #085041; }
-  .btn-purple { background: #6c63d4; color: white; border: none; border-radius: 50px; width: 100%; padding: 16px; font-size: 17px; font-weight: 600; cursor: pointer; font-family: inherit; }
-  @keyframes blink-green { 0%,100% { background: #d4f5e5; border-color: #1D9E75; } 50% { background: #1D9E75; border-color: #085041; } }
+  .card-val { color: #1a1a2e; margin-left: 4px; }
+  .green-title { font-size: 22px; font-weight: 600; color: #0a3d2b; text-align: center; margin-bottom: 8px; }
+  .green-sub { text-align: center; font-size: 14px; color: #0a3d2b; }
+  .green-sub b { color: #0a3d2b; }
+  .btn-purple { background: #6c3fd4; color: white; border: none; border-radius: 50px; width: 100%; padding: 16px; font-size: 17px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  @keyframes blink-green { 0%,100% { background: #b6f0d8; border-color: #1D9E75; } 50% { background: #1D9E75; border-color: #085041; } }
   .card.green.blinking { animation: blink-green 1s ease-in-out 3; }
   .btn-outline { background: white; color: #1a1a2e; border: 2px solid #b8a8e8; border-radius: 50px; width: 100%; padding: 14px; font-size: 17px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: inherit; }
-  .footer { text-align: center; font-size: 12px; color: #888; line-height: 2; }
-  .footer b { color: #555; }
+  .footer { text-align: center; font-size: 12px; color: #555; line-height: 2; }
+  .footer b { color: #1a1a2e; }
   .save-notice { font-size: 12px; color: #6c63d4; text-align: center; }
 </style>
 </head>
@@ -246,8 +246,12 @@ function updateTimestamp() {
   var y = now.getFullYear();
   var h = String(now.getHours()).padStart(2,'0');
   var mi = String(now.getMinutes()).padStart(2,'0');
-  var tz = now.toLocaleTimeString('nb', {timeZoneName:'short'}).split(' ').pop();
-  document.getElementById('lastUpdated').textContent = d+'.'+mo+'.'+y+' kl. '+h+':'+mi+' ('+tz+')';
+  var tz = 'CEST';
+  try {
+    tz = now.toLocaleTimeString('nb-NO', {timeZoneName:'short'}).split(' ').pop();
+  } catch(e) {}
+  var el = document.getElementById('lastUpdated');
+  if (el) el.textContent = d+'.'+mo+'.'+y+' kl. '+h+':'+mi+' ('+tz+')';
 }
 updateTimestamp();
 load();
