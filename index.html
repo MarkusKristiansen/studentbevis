@@ -25,7 +25,7 @@
   .photo-circle img { width: 100%; height: 100%; object-fit: cover; }
   .photo-circle .initials { font-size: 32px; font-weight: 500; color: #534AB7; }
   .upload-btn { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; border-radius: 50%; background: #6c63d4; border: 2px solid white; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; }
-  .edit-toggle { background: none; border: none; color: #6c63d4; font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px 12px; border-radius: 20px; border: 1.5px solid #b8a8e8; background: white; opacity: 0; pointer-events: none; }
+  .edit-toggle { display: none; }
   .edit-panel { background: white; border-radius: 16px; border: 2px solid #b8a8e8; width: 100%; padding: 18px 20px; display: none; }
   .edit-panel h3 { font-size: 13px; font-weight: 600; color: #888; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
   .field { margin-bottom: 11px; }
@@ -65,7 +65,7 @@
 </div>
 
 <div class="content">
-  <div class="photo-wrap">
+      <div class="photo-wrap" id="photoWrap">
     <div class="photo-circle" id="photoCircle">
       <span class="initials" id="initials">IR</span>
     </div>
@@ -198,6 +198,14 @@ function loadPhoto(input) {
   };
   reader.readAsDataURL(input.files[0]);
 }
+
+var tapCount = 0, tapTimer;
+document.getElementById('photoWrap').addEventListener('click', function() {
+  tapCount++;
+  if (tapCount === 2) { tapCount = 0; clearTimeout(tapTimer); toggleEdit(); return; }
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(function() { tapCount = 0; }, 600);
+});
 
 document.querySelector('.btn-purple').addEventListener('click', function() {
   var card = document.querySelector('.card.green');
