@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="nb">
 <head>
-<link rel="apple-touch-icon" href="icon.png"> 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,6 +20,16 @@
   .menu-btn { background: none; border: none; display: flex; flex-direction: column; gap: 3px; cursor: pointer; padding: 6px; }
   .menu-btn span { width: 4px; height: 4px; border-radius: 50%; background: transparent; border: 1.5px solid #6c63d4; display: block; box-sizing: border-box; }
   .menu-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; }
+  .esc-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
+  .esc-overlay.open { display: flex; }
+  .esc-modal { background: white; border-radius: 20px; border: 2px solid #b8a8e8; width: 88%; max-width: 360px; padding: 28px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .esc-title { font-size: 20px; font-weight: 600; color: #1a1a2e; text-align: center; }
+  .esc-logo { display: flex; align-items: center; gap: 12px; }
+  .esc-logo-text { font-size: 16px; font-weight: 700; color: #003399; line-height: 1.2; }
+  .esc-qr { width: 200px; height: 200px; }
+  .esc-info { background: #e8edf8; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #333; text-align: center; width: 100%; }
+  .esc-link { font-size: 13px; color: #4a6cf7; text-decoration: underline; cursor: pointer; text-align: center; }
+  .esc-close { background: #6c3fd4; color: white; border: none; border-radius: 50px; width: 100%; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
   .menu-dropdown { position: absolute; top: 52px; right: 16px; background: white; border-radius: 14px; border: 0.5px solid #d0c8e8; width: 220px; overflow: hidden; box-shadow: 0 4px 24px rgba(108,99,212,0.13); z-index: 101; }
   .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; font-size: 16px; color: #1a1a2e; border-bottom: 0.5px solid #ece8f5; cursor: pointer; }
   .menu-item:last-child { border-bottom: none; color: #c0392b; }
@@ -132,10 +141,40 @@
 
   <button class="btn-purple">Kontroll</button>
 
-  <button class="btn-outline">
+  <button class="btn-outline" id="escBtn">
     Europeisk studentbevis
-    <i class="ti ti-qrcode" style="font-size:20px"></i>
+    <i class="ti ti-qrcode" style="font-size:18px"></i>
   </button>
+
+  <div class="esc-overlay" id="escOverlay">
+    <div class="esc-modal">
+      <div class="esc-title">European Student Card</div>
+      <div class="esc-logo">
+        <svg width="48" height="32" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
+          <rect width="48" height="32" fill="#003399" rx="3"/>
+          <g fill="#FFCC00">
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(30,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(60,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(90,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(120,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(150,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(180,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(210,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(240,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(270,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(300,24,16) translate(0,-1)"/>
+            <polygon points="24,4 24.7,6.2 27,6.2 25.2,7.5 25.9,9.7 24,8.4 22.1,9.7 22.8,7.5 21,6.2 23.3,6.2" transform="rotate(330,24,16) translate(0,-1)"/>
+          </g>
+        </svg>
+        <div class="esc-logo-text">European<br>Student Card</div>
+      </div>
+      <canvas class="esc-qr" id="escQr"></canvas>
+      <div class="esc-info">This QR Code can be read to validate student status for services across Europe.</div>
+      <div class="esc-link" onclick="window.open('https://europeanstudentcard.eu','_blank')">Read more about the European Student Card</div>
+      <button class="esc-close" onclick="document.getElementById('escOverlay').classList.remove('open')">Lukk</button>
+    </div>
+  </div>
 
   <div class="footer">
     <b>Sist oppdatert:</b> 09.04.2026 kl. 22:02 (CEST)<br>
@@ -144,6 +183,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 var STORE_KEY = 'studentbevis_data';
 
@@ -214,6 +254,21 @@ function loadPhoto(input) {
   };
   reader.readAsDataURL(input.files[0]);
 }
+
+document.getElementById('escBtn').addEventListener('click', function() {
+  document.getElementById('escOverlay').classList.add('open');
+  if (!window._qrGenerated) {
+    window._qrGenerated = true;
+    new QRCode(document.getElementById('escQr'), {
+      text: 'https://europeanstudentcard.eu/verify/' + (document.getElementById('inNum').value || '544677'),
+      width: 200, height: 200,
+      colorDark: '#000000', colorLight: '#ffffff'
+    });
+  }
+});
+document.getElementById('escOverlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
 
 document.getElementById('menuBtn').addEventListener('click', function(e) {
   e.stopPropagation();
