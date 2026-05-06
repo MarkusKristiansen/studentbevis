@@ -106,7 +106,6 @@
   <div class="edit-panel" id="editPanel">
     <h3>Rediger studentbevis</h3>
     <div class="field"><label>Navn</label><input id="inName" value="Ida Rasch" oninput="updateCard()"></div>
-    <div class="field"><label>Alder</label><input id="inAge" type="number" value="24" oninput="updateCard()"></div>
     <div class="field"><label>Fødselsdato</label><input id="inBirth" value="15.04.2001" oninput="updateCard()"></div>
     <div class="field"><label>Studentnummer</label><input id="inNum" value="544677" oninput="updateCard()"></div>
     <div class="field"><label>Studiested</label><input id="inPlace" value="Norges teknisk-naturvitenskapelige universitet" oninput="updateCard()"></div>
@@ -224,7 +223,8 @@ function load() {
 
 function updateCard() {
   var name = document.getElementById('inName').value;
-  var age = document.getElementById('inAge').value;
+  var birth = document.getElementById('inBirth').value;
+  var age = calcAge(birth);
   document.getElementById('displayName').textContent = name + (age ? ' (' + age + ')' : '');
   document.getElementById('displayBirth').textContent = document.getElementById('inBirth').value;
   document.getElementById('displayNum').textContent = document.getElementById('inNum').value;
@@ -310,6 +310,19 @@ function updateTimestamp() {
   var el = document.getElementById('lastUpdated');
   if (el) el.textContent = d+'.'+mo+'.'+y+' kl. '+h+':'+mi+' ('+tz+')';
 }
+
+function calcAge(birthStr) {
+  var parts = birthStr.split('.');
+  if (parts.length !== 3) return '';
+  var birth = new Date(parts[2], parts[1]-1, parts[0]);
+  if (isNaN(birth)) return '';
+  var today = new Date();
+  var age = today.getFullYear() - birth.getFullYear();
+  var m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+ 
 updateTimestamp();
 load();
 </script>
