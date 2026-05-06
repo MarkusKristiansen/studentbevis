@@ -18,7 +18,13 @@
   .logo-icon span:first-child { background: #2d2a6e; }
   .logo-icon span:last-child { background: #6c63d4; }
   .menu-btn { background: none; border: none; display: flex; flex-direction: column; gap: 3px; cursor: pointer; padding: 6px; }
-  .menu-btn span { width: 4px; height: 4px; border-radius: 50%; background: #6c63d4; display: block; }
+  .menu-btn span { width: 4px; height: 4px; border-radius: 50%; background: transparent; border: 1.5px solid #6c63d4; display: block; box-sizing: border-box; }
+  .menu-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; }
+  .menu-dropdown { position: absolute; top: 52px; right: 16px; background: white; border-radius: 14px; border: 0.5px solid #d0c8e8; width: 220px; overflow: hidden; box-shadow: 0 4px 24px rgba(108,99,212,0.13); z-index: 101; }
+  .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; font-size: 16px; color: #1a1a2e; border-bottom: 0.5px solid #ece8f5; cursor: pointer; }
+  .menu-item:last-child { border-bottom: none; color: #c0392b; }
+  .menu-item i { font-size: 20px; color: #6c63d4; }
+  .menu-item:last-child i { color: #c0392b; }
   .content { padding: 28px 20px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 480px; margin: 0 auto; }
   .photo-wrap { position: relative; }
   .photo-circle { width: 100px; height: 100px; border-radius: 50%; background: #c9c0e8; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 12px rgba(108,99,212,0.15); }
@@ -59,9 +65,18 @@
     <div class="logo-icon"><span></span><span></span></div>
     Sikt
   </div>
-  <button class="menu-btn" aria-label="Meny">
+  <button class="menu-btn" id="menuBtn" aria-label="Meny">
     <span></span><span></span><span></span>
   </button>
+</div>
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-dropdown">
+    <div class="menu-item">Bibliotekkort <i class="ti ti-barcode"></i></div>
+    <div class="menu-item">Vilkår <i class="ti ti-book"></i></div>
+    <div class="menu-item">Personvern <i class="ti ti-lock"></i></div>
+    <div class="menu-item">Logg ut <i class="ti ti-logout"></i></div>
+  </div>
 </div>
 
 <div class="content">
@@ -198,6 +213,15 @@ function loadPhoto(input) {
   };
   reader.readAsDataURL(input.files[0]);
 }
+
+document.getElementById('menuBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  var o = document.getElementById('menuOverlay');
+  o.style.display = o.style.display === 'block' ? 'none' : 'block';
+});
+document.getElementById('menuOverlay').addEventListener('click', function() {
+  this.style.display = 'none';
+});
 
 var tapCount = 0, tapTimer;
 document.getElementById('photoWrap').addEventListener('click', function() {
