@@ -310,6 +310,9 @@ document.querySelector('.btn-purple').addEventListener('click', function() {
 
 updateTimestamp();
 load();
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 </body>
 </html>
