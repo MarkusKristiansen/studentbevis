@@ -257,13 +257,50 @@ function toggleEdit() {
 function loadPhoto(input) {
   if (!input.files || !input.files[0]) return;
   var reader = new FileReader();
+  
   reader.onload = function(e) {
-    window._savedPhoto = e.target.result;
-    document.getElementById('photoCircle').innerHTML = '<img src="' + e.target.result + '" alt="Studentbilde">';
-    save();
+    var img = new Image();
+    img.onload = function() {
+      // 1. Create a canvas to resize the image
+      var canvas = document.createElement('canvas');
+      var MAX_WIDTH = 400;
+      var MAX_HEIGHT = 400;
+      var width = img.width;
+      var height = img.height;
+
+      // 2. Calculate the new dimensions while keeping the aspect ratio
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+
+      // 3. Draw the image to the canvas
+      canvas.width = width;
+      canvas.height = height;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // 4. Convert back to a base64 string (compress to JPEG at 70% quality)
+      var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+      // 5. Save and update DOM
+      window._savedPhoto = compressedDataUrl;
+      document.getElementById('photoCircle').innerHTML = '<img src="' + compressedDataUrl + '" alt="Studentbilde">';
+      save();
+    };
+    img.src = e.target.result;
   };
+  
   reader.readAsDataURL(input.files[0]);
 }
+ 
 
 function updateTimestamp() {
   var now = new Date();
