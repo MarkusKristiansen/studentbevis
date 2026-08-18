@@ -28,9 +28,10 @@
   .menu-item:last-child { border-bottom: none; color: #c0392b; }
   .menu-item i { font-size: 20px; color: #6c63d4; }
   .menu-item:last-child i { color: #c0392b; }
-  .esc-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
-  .esc-overlay.open { display: flex; }
-  .esc-modal { background: white; border-radius: 20px; border: 2px solid #b8a8e8; width: 88%; max-width: 360px; padding: 28px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .esc-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200; visibility: hidden; opacity: 0; background: rgba(0,0,0,0.4); pointer-events: none; display: flex; align-items: center; justify-content: center; transition: opacity 250ms ease, visibility 0s linear 380ms; }
+  .esc-overlay.open { visibility: visible; opacity: 1; pointer-events: auto; transition-delay: 0s; }
+  .esc-modal { background: white; border-radius: 20px; border: 2px solid #b8a8e8; width: 88%; max-width: 360px; padding: 28px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; transform: translateY(110vh); transition: transform 380ms cubic-bezier(.2,.8,.2,1); }
+  .esc-overlay.open .esc-modal { transform: translateY(0); }
   .esc-title { font-size: 20px; font-weight: 600; color: #1a1a2e; text-align: center; }
   .esc-logo { display: flex; align-items: center; gap: 12px; }
   .esc-logo-text { font-size: 16px; font-weight: 700; color: #003399; line-height: 1.2; }
@@ -40,7 +41,9 @@
   .esc-close { background: #6c3fd4; color: white; border: none; border-radius: 50px; width: 100%; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
   .content { padding: 28px 20px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 480px; margin: 0 auto; }
   .photo-wrap { position: relative; }
-  .photo-circle { width: 100px; height: 100px; border-radius: 50%; background: #c9c0e8; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .photo-wrap { cursor: pointer; touch-action: manipulation; }
+  .photo-circle { width: 100px; height: 100px; border-radius: 50%; background: #c9c0e8; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: opacity 180ms ease; }
+  .photo-wrap.holding .photo-circle { opacity: 0.15; }
   .photo-circle img { width: 100%; height: 100%; object-fit: cover; }
   .photo-circle .initials { font-size: 32px; font-weight: 500; color: #534AB7; }
   .upload-btn { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; border-radius: 50%; background: #6c63d4; border: 2px solid white; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; }
@@ -89,6 +92,15 @@
   .footer { text-align: center; font-size: 10px; color: #0a0130; font-weight: 400; line-height: 2; }
   .footer b { color: #0a0130; font-weight: 700; }
   .save-notice { font-size: 12px; color: #6c63d4; text-align: center; }
+  .profile-preview-overlay { position: fixed; top: 56px; right: 0; bottom: 0; left: 0; z-index: 300; visibility: hidden; background: rgba(255,255,255,0); pointer-events: none; transition: background-color 180ms ease, visibility 0s linear 380ms, top 0s linear 380ms; }
+  .profile-preview-overlay.holding { background: rgba(255,255,255,0); }
+  .profile-preview-overlay.open { top: 0; visibility: visible; background: rgba(0,0,0,0.72); pointer-events: auto; transition: background-color 180ms ease, top 0s; }
+  .profile-preview-content { position: absolute; top: 52%; left: 50%; width: 74.5vw; max-width: 703px; aspect-ratio: 1; transform: translate(-50%, calc(-50% + 120vh)); transition: transform 380ms cubic-bezier(.2,.8,.2,1); }
+  .profile-preview-overlay.open .profile-preview-content { transform: translate(-50%, -50%); }
+  .profile-preview-image { width: 100%; height: 100%; background: #f3f0f8; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .profile-preview-image img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-preview-image .initials { font-size: 32px; font-weight: 400; color: #534ab7; }
+  .profile-preview-close { position: absolute; top: -26px; right: 3px; width: 23px; height: 23px; border: 1.5px solid white; border-radius: 50%; background: transparent; color: white; display: flex; align-items: center; justify-content: center; font-family: Arial, sans-serif; font-size: 21px; font-weight: 200; line-height: 1; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -112,11 +124,10 @@
 </div>
 
 <div class="content">
-  <div class="photo-wrap" id="photoWrap">
+  <div class="photo-wrap" id="photoWrap" role="button" tabindex="0" aria-label="Vis profilbilde">
     <div class="photo-circle" id="photoCircle">
       <span class="initials" id="initials">IR</span>
     </div>
-    </button>
     <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="loadPhoto(this)">
   </div>
 
@@ -200,6 +211,13 @@
     <b>Sist oppdatert:</b> <span id="lastUpdated"></span><br>
     <b>Tidssone:</b> Europe/Oslo<br>
     <b>Versjon: 4.3.0</b>
+  </div>
+</div>
+
+<div class="profile-preview-overlay" id="profilePreview" aria-hidden="true">
+  <div class="profile-preview-content">
+    <button class="profile-preview-close" id="profilePreviewClose" aria-label="Lukk profilbilde">×</button>
+    <div class="profile-preview-image" id="profilePreviewImage"></div>
   </div>
 </div>
 
@@ -355,6 +373,53 @@ document.getElementById('editMenuItem').addEventListener('click', function() {
   document.getElementById('menuOverlay').style.display = 'none';
   toggleEdit();
 });
+
+var profilePreview = document.getElementById('profilePreview');
+var profilePreviewImage = document.getElementById('profilePreviewImage');
+
+function openProfilePreview() {
+  var sourceImage = document.querySelector('#photoCircle img');
+  profilePreviewImage.innerHTML = '';
+  if (sourceImage) {
+    var previewImage = document.createElement('img');
+    previewImage.src = sourceImage.src;
+    previewImage.alt = 'Profilbilde';
+    profilePreviewImage.appendChild(previewImage);
+  } else {
+    var previewInitials = document.createElement('span');
+    previewInitials.className = 'initials';
+    previewInitials.textContent = document.getElementById('initials').textContent;
+    profilePreviewImage.appendChild(previewInitials);
+  }
+  document.getElementById('photoWrap').classList.remove('holding');
+  profilePreview.classList.remove('holding');
+  profilePreview.classList.add('open');
+  profilePreview.setAttribute('aria-hidden', 'false');
+}
+
+function closeProfilePreview() {
+  document.getElementById('photoWrap').classList.remove('holding');
+  profilePreview.classList.remove('open', 'holding');
+  profilePreview.setAttribute('aria-hidden', 'true');
+}
+
+document.getElementById('photoWrap').addEventListener('pointerdown', function(e) {
+  if (e.button !== undefined && e.button !== 0) return;
+  this.setPointerCapture(e.pointerId);
+  this.classList.add('holding');
+  profilePreview.classList.add('holding');
+});
+document.getElementById('photoWrap').addEventListener('pointerup', function() {
+  if (profilePreview.classList.contains('holding')) openProfilePreview();
+});
+document.getElementById('photoWrap').addEventListener('pointercancel', closeProfilePreview);
+document.getElementById('photoWrap').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    openProfilePreview();
+  }
+});
+document.getElementById('profilePreviewClose').addEventListener('click', closeProfilePreview);
 
 document.querySelector('.btn-purple').addEventListener('click', function() {
   var button = this;
