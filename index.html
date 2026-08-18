@@ -107,7 +107,7 @@
     <div class="menu-item">Bibliotekkort <i class="ti ti-barcode"></i></div>
     <div class="menu-item">Vilkår <i class="ti ti-book"></i></div>
     <div class="menu-item">Personvern <i class="ti ti-lock"></i></div>
-    <div class="menu-item">Logg ut <i class="ti ti-logout"></i></div>
+    <div class="menu-item" id="editMenuItem">Logg ut <i class="ti ti-logout"></i></div>
   </div>
 </div>
 
@@ -351,12 +351,9 @@ document.getElementById('menuOverlay').addEventListener('click', function() {
   this.style.display = 'none';
 });
 
-var tapCount = 0, tapTimer;
-document.getElementById('photoWrap').addEventListener('click', function() {
-  tapCount++;
-  if (tapCount === 2) { tapCount = 0; clearTimeout(tapTimer); toggleEdit(); return; }
-  clearTimeout(tapTimer);
-  tapTimer = setTimeout(function() { tapCount = 0; }, 600);
+document.getElementById('editMenuItem').addEventListener('click', function() {
+  document.getElementById('menuOverlay').style.display = 'none';
+  toggleEdit();
 });
 
 document.querySelector('.btn-purple').addEventListener('click', function() {
