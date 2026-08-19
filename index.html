@@ -235,6 +235,87 @@
 
 <script>
 var STORE_KEY = 'studentbevis_data';
+var DB_NAME = 'studentbevis_db';
+var DB_STORE = 'settings';
+var DB_KEY = 'profile';
+var DEFAULT_DATA = {
+  name: 'Ida Rasch',
+  birth: '15.04.2001',
+  num: '544677',
+  place: 'Norges teknisk-naturvitenskapelige universitet',
+  sem: 'Høst 2026',
+  exp: '31.01.2027',
+  photo: null
+};
+
+function openDb() {
+  return new Promise(function(resolve, reject) {
+    if (!('indexedDB' in window)) {
+      resolve(null);
+      return;
+    }
+    var req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains(DB_STORE)) {
+        db.createObjectStore(DB_STORE);
+      }
+    };
+    req.onsuccess = function() { resolve(req.result); };
+    req.onerror = function() { reject(req.error); };
+  });
+}
+
+function dbSet(key, value) {
+  return openDb().then(function(db) {
+    if (!db) return;
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(value, key);
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function() { reject(tx.error); };
+      tx.onabort = function() { reject(tx.error); };
+    });
+  });
+}
+
+function dbGet(key) {
+  return openDb().then(function(db) {
+    if (!db) return null;
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(DB_STORE, 'readonly');
+      var req = tx.objectStore(DB_STORE).get(key);
+      req.onsuccess = function() { resolve(req.result || null); };
+      req.onerror = function() { reject(req.error); };
+    });
+  });
+}
+
+function mergeData(raw) {
+  var source = raw || {};
+  return {
+    name: typeof source.name === 'string' && source.name.trim() !== '' ? source.name : DEFAULT_DATA.name,
+    birth: typeof source.birth === 'string' && source.birth.trim() !== '' ? source.birth : DEFAULT_DATA.birth,
+    num: typeof source.num === 'string' && source.num.trim() !== '' ? source.num : DEFAULT_DATA.num,
+    place: typeof source.place === 'string' && source.place.trim() !== '' ? source.place : DEFAULT_DATA.place,
+    sem: typeof source.sem === 'string' && source.sem.trim() !== '' ? source.sem : DEFAULT_DATA.sem,
+    exp: typeof source.exp === 'string' && source.exp.trim() !== '' ? source.exp : DEFAULT_DATA.exp,
+    photo: typeof source.photo === 'string' && source.photo ? source.photo : null
+  };
+}
+
+function applyData(d) {
+  document.getElementById('inName').value = d.name;
+  document.getElementById('inBirth').value = d.birth;
+  document.getElementById('inNum').value = d.num;
+  document.getElementById('inPlace').value = d.place;
+  document.getElementById('inSem').value = d.sem;
+  document.getElementById('inExp').value = d.exp;
+  if (d.photo) {
+    window._savedPhoto = d.photo;
+    document.getElementById('photoCircle').innerHTML = '<img src="' + d.photo + '" alt="Studentbilde">';
+  }
+}
 
 function calcAge(birthStr) {
   var parts = birthStr.split('.');
@@ -259,25 +340,30 @@ function save() {
     photo: window._savedPhoto || null
   };
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
+  dbSet(DB_KEY, data).catch(function() {});
 }
 
-function load() {
+async function load() {
+  var data = null;
   try {
-    var raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return;
-    var d = JSON.parse(raw);
-    if (d.name) document.getElementById('inName').value = d.name;
-    if (d.birth) document.getElementById('inBirth').value = d.birth;
-    if (d.num) document.getElementById('inNum').value = d.num;
-    if (d.place) document.getElementById('inPlace').value = d.place;
-    if (d.sem) document.getElementById('inSem').value = d.sem;
-    if (d.exp) document.getElementById('inExp').value = d.exp;
-    if (d.photo) {
-      window._savedPhoto = d.photo;
-      document.getElementById('photoCircle').innerHTML = '<img src="' + d.photo + '" alt="Studentbilde">';
-    }
-    updateCard();
+    data = await dbGet(DB_KEY);
   } catch(e) {}
+
+  if (!data) {
+    try {
+      var legacyRaw = localStorage.getItem(STORE_KEY);
+      if (legacyRaw) data = JSON.parse(legacyRaw);
+    } catch(e) {}
+  }
+
+  var merged = mergeData(data);
+  applyData(merged);
+  updateCard();
+
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(merged));
+  } catch(e) {}
+  dbSet(DB_KEY, merged).catch(function() {});
 }
 
 function updateCard() {
